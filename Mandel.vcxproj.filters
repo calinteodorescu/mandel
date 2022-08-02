@@ -16,6 +16,21 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="%2a%2a%2a Programs">
+      <UniqueIdentifier>{7fbd1265-c095-4aa4-8259-cd2ff607e21e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Chain">
+      <UniqueIdentifier>{6e9c4967-d6df-4e18-862a-a879ee4e31ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Plugins">
+      <UniqueIdentifier>{5e9939b8-5d1a-4bac-8b5c-aa22901261a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Plugins\Chain">
+      <UniqueIdentifier>{f7f5bdb2-73f1-4a2a-9d9e-cacf73925f3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Plugins\Net">
+      <UniqueIdentifier>{f4fde482-cb49-443a-a56a-b6b0298a0123}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="eosio-wasm-spec-tests\generated-tests\address.cpp">
@@ -283,9 +298,6 @@
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="libraries\chain\chain_id_type.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\chain\controller.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="libraries\chain\deep_mind.cpp">
@@ -3303,9 +3315,6 @@
     <ClCompile Include="plugins\chain_plugin\account_query_db.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugins\chain_plugin\chain_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="plugins\chain_plugin\trx_finality_status_processing.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
@@ -3337,9 +3346,6 @@
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\net_api_plugin\net_api_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins\net_plugin\net_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\producer_api_plugin\producer_api_plugin.cpp">
@@ -4178,6 +4184,15 @@
     </ClCompile>
     <ClCompile Include="unittests\test-contracts\wasm_config_bios\wasm_config_bios.cpp">
       <Filter>%2a%2a Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\chain_plugin\chain_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins\Chain</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\chain\controller.cpp">
+      <Filter>%2a%2a%2a Chain</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\net_plugin\net_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins\Net</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
