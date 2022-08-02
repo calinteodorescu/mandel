@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mandel", "Mandel.vcxproj", "{1D5036AD-1278-4263-A7BF-9CCE6D87CD26}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "00 Documents Library", "..\..\Work\Documents Library\Documents Library.vcxproj", "{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{1D5036AD-1278-4263-A7BF-9CCE6D87CD26}.Release|x64.Build.0 = Release|x64
 		{1D5036AD-1278-4263-A7BF-9CCE6D87CD26}.Release|x86.ActiveCfg = Release|Win32
 		{1D5036AD-1278-4263-A7BF-9CCE6D87CD26}.Release|x86.Build.0 = Release|Win32
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Debug|x64.ActiveCfg = Debug|x64
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Debug|x64.Build.0 = Debug|x64
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Debug|x86.ActiveCfg = Debug|Win32
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Debug|x86.Build.0 = Debug|Win32
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Release|x64.ActiveCfg = Release|x64
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Release|x64.Build.0 = Release|x64
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Release|x86.ActiveCfg = Release|Win32
+		{B0CB9797-B435-4B9A-8E9A-29DB7E6EEAA6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

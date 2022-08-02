@@ -25,12 +25,6 @@
     <Filter Include="%2a%2a%2a Plugins">
       <UniqueIdentifier>{5e9939b8-5d1a-4bac-8b5c-aa22901261a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="%2a%2a%2a Plugins\Chain">
-      <UniqueIdentifier>{f7f5bdb2-73f1-4a2a-9d9e-cacf73925f3d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="%2a%2a%2a Plugins\Net">
-      <UniqueIdentifier>{f4fde482-cb49-443a-a56a-b6b0298a0123}</UniqueIdentifier>
-    </Filter>
     <Filter Include="%2a%2a%2a Programs\nodeos">
       <UniqueIdentifier>{b0dedd16-38d9-4278-ba57-c3c7864f2af9}</UniqueIdentifier>
     </Filter>
@@ -3348,9 +3342,6 @@
     <ClCompile Include="plugins\http_client_plugin\http_client_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugins\http_plugin\http_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="plugins\login_plugin\login_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
@@ -3363,9 +3354,6 @@
     <ClCompile Include="plugins\producer_plugin\pending_snapshot.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugins\producer_plugin\producer_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="plugins\producer_plugin\test\test_snapshot_information.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
@@ -3373,9 +3361,6 @@
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\producer_plugin\test\test_trx_full.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins\resource_monitor_plugin\resource_monitor_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\resource_monitor_plugin\system_file_space_provider.cpp">
@@ -3394,9 +3379,6 @@
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\signature_provider_plugin\signature_provider_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins\state_history_plugin\state_history_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\template_plugin\template_plugin.cpp">
@@ -3453,9 +3435,6 @@
     <ClCompile Include="plugins\txn_test_gen_plugin\txn_test_gen_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugins\wallet_api_plugin\wallet_api_plugin.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="plugins\wallet_plugin\se_wallet.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
@@ -3463,9 +3442,6 @@
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\wallet_plugin\wallet_manager.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins\wallet_plugin\wallet_plugin.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="plugins\wallet_plugin\yubihsm_wallet.cpp">
@@ -4185,14 +4161,8 @@
     <ClCompile Include="unittests\test-contracts\wasm_config_bios\wasm_config_bios.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="plugins\chain_plugin\chain_plugin.cpp">
-      <Filter>%2a%2a%2a Plugins\Chain</Filter>
-    </ClCompile>
     <ClCompile Include="libraries\chain\controller.cpp">
       <Filter>%2a%2a%2a Chain</Filter>
-    </ClCompile>
-    <ClCompile Include="plugins\net_plugin\net_plugin.cpp">
-      <Filter>%2a%2a%2a Plugins\Net</Filter>
     </ClCompile>
     <ClCompile Include="programs\nodeos\main.cpp">
       <Filter>%2a%2a%2a Programs\nodeos</Filter>
@@ -4202,6 +4172,30 @@
     </ClCompile>
     <ClCompile Include="programs\keosd\main.cpp">
       <Filter>%2a%2a%2a Programs\keosd</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\producer_plugin\producer_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\net_plugin\net_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\chain_plugin\chain_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\resource_monitor_plugin\resource_monitor_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\wallet_plugin\wallet_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\state_history_plugin\state_history_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\wallet_api_plugin\wallet_api_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="plugins\http_plugin\http_plugin.cpp">
+      <Filter>%2a%2a%2a Plugins</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
