@@ -31,6 +31,15 @@
     <Filter Include="%2a%2a%2a Plugins\Net">
       <UniqueIdentifier>{f4fde482-cb49-443a-a56a-b6b0298a0123}</UniqueIdentifier>
     </Filter>
+    <Filter Include="%2a%2a%2a Programs\nodeos">
+      <UniqueIdentifier>{b0dedd16-38d9-4278-ba57-c3c7864f2af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Programs\cleos">
+      <UniqueIdentifier>{bd70d2d2-99e3-4366-96f1-d6340f6edf20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="%2a%2a%2a Programs\keosd">
+      <UniqueIdentifier>{d0084ac2-9af0-4eaa-a544-4bbf31b95648}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="eosio-wasm-spec-tests\generated-tests\address.cpp">
@@ -3465,19 +3474,10 @@
     <ClCompile Include="programs\cleos\httpc.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="programs\cleos\main.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="programs\eosio-blocklog\main.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="programs\eosio-launcher\main.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="programs\keosd\main.cpp">
-      <Filter>%2a%2a Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="programs\nodeos\main.cpp">
       <Filter>%2a%2a Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tests\block_log.cpp">
@@ -4193,6 +4193,15 @@
     </ClCompile>
     <ClCompile Include="plugins\net_plugin\net_plugin.cpp">
       <Filter>%2a%2a%2a Plugins\Net</Filter>
+    </ClCompile>
+    <ClCompile Include="programs\nodeos\main.cpp">
+      <Filter>%2a%2a%2a Programs\nodeos</Filter>
+    </ClCompile>
+    <ClCompile Include="programs\cleos\main.cpp">
+      <Filter>%2a%2a%2a Programs\cleos</Filter>
+    </ClCompile>
+    <ClCompile Include="programs\keosd\main.cpp">
+      <Filter>%2a%2a%2a Programs\keosd</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
