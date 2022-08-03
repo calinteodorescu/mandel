@@ -20,16 +20,17 @@
 using namespace appbase;
 using namespace eosio;
 
-namespace detail {
+namespace detail 
+{
 
-fc::logging_config& add_deep_mind_logger(fc::logging_config& config) {
-   config.appenders.push_back(
-      fc::appender_config( "deep-mind", "dmlog" )
-   );
+fc::logging_config& add_deep_mind_logger(fc::logging_config& config) 
+{
+   config.appenders.push_back( fc::appender_config( "deep-mind", "dmlog" )
+                             );
 
    fc::logger_config dmlc;
-   dmlc.name = "deep-mind";
-   dmlc.level = fc::log_level::debug;
+   dmlc.name    = "deep-mind";
+   dmlc.level   = fc::log_level::debug;
    dmlc.enabled = true;
    dmlc.appenders.push_back("deep-mind");
 
@@ -40,26 +41,41 @@ fc::logging_config& add_deep_mind_logger(fc::logging_config& config) {
 
 void configure_logging(const bfs::path& config_path)
 {
-   try {
-      try {
-         if( fc::exists( config_path ) ) {
+   try 
+   {
+      try 
+      {
+         if( fc::exists( config_path ) ) 
+         {
             fc::configure_logging( config_path );
-         } else {
+         } 
+         else 
+         {
             auto cfg = fc::logging_config::default_config();
 
             fc::configure_logging( ::detail::add_deep_mind_logger(cfg) );
          }
-      } catch (...) {
+      } 
+      catch (...) 
+      {
          elog("Error reloading logging.json");
          throw;
       }
-   } catch (const fc::exception& e) {
+   } 
+   catch (const fc::exception& e) 
+   {
       elog("${e}", ("e",e.to_detail_string()));
-   } catch (const boost::exception& e) {
+   } 
+   catch (const boost::exception& e) 
+   {
       elog("${e}", ("e",boost::diagnostic_information(e)));
-   } catch (const std::exception& e) {
+   } 
+   catch (const std::exception& e) 
+   {
       elog("${e}", ("e",e.what()));
-   } catch (...) {
+   } 
+   catch (...) 
+   {
       // empty
    }
 }
@@ -69,9 +85,12 @@ void configure_logging(const bfs::path& config_path)
 void logging_conf_handler()
 {
    auto config_path = app().get_logging_conf();
-   if( fc::exists( config_path ) ) {
+   if( fc::exists( config_path ) ) 
+   {
       ilog( "Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()) );
-   } else {
+   } 
+   else 
+   {
       ilog( "Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()) );
    }
    ::detail::configure_logging( config_path );
@@ -83,7 +102,8 @@ void initialize_logging()
    auto config_path = app().get_logging_conf();
    if(fc::exists(config_path))
      fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-   else {
+   else
+   {
       auto cfg = fc::logging_config::default_config();
 
       fc::configure_logging( ::detail::add_deep_mind_logger(cfg) );
@@ -107,7 +127,8 @@ enum return_codes {
 
 int main(int argc, char** argv)
 {
-   try {
+   try 
+   {
       app().set_version(eosio::nodeos::config::version);
       app().set_version_string(eosio::version::version_client());
       app().set_full_version_string(eosio::version::version_full());
@@ -119,16 +140,20 @@ int main(int argc, char** argv)
          .default_unix_socket_path = "",
          .default_http_port = 8888
       });
-      if(!app().initialize<chain_plugin, net_plugin, producer_plugin, resource_monitor_plugin>(argc, argv)) {
+      if(!app().initialize<chain_plugin, net_plugin, producer_plugin, resource_monitor_plugin>(argc, argv)) 
+      {
          const auto& opts = app().get_options();
          if( opts.count("help") || opts.count("version") || opts.count("full-version") || opts.count("print-default-config") ) {
             return SUCCESS;
          }
          return INITIALIZE_FAIL;
       }
-      if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>()) {
+      if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>()) 
+      {
          resmon_plugin->monitor_directory(app().data_dir());
-      } else {
+      } 
+      else 
+      {
          elog("resource_monitor_plugin failed to initialize");
          return INITIALIZE_FAIL;
       }
