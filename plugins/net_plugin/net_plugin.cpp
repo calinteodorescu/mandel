@@ -47,8 +47,8 @@ namespace eosio {
 
    class connection;
 
-   using connection_ptr = std::shared_ptr<connection>;
-   using connection_wptr = std::weak_ptr<connection>;
+   using connection_ptr  = std::shared_ptr<connection>;
+   using connection_wptr = std::weak_ptr  <connection>;
 
    template <typename Strand>
    void verify_strand_in_this_thread(const Strand& strand, const char* func, int line) {
@@ -853,10 +853,13 @@ namespace eosio {
    };
 
    template<typename Function>
-   void for_each_connection( Function f ) {
+   void for_each_connection( Function f ) 
+   {
       std::shared_lock<std::shared_mutex> g( my_impl->connections_mtx );
-      for( auto& c : my_impl->connections ) {
-         if( !f( c ) ) return;
+      for( auto& c : my_impl->connections ) 
+      {
+         if( ! f( c ) ) 
+             return;
       }
    }
 
@@ -2175,24 +2178,52 @@ namespace eosio {
       fc_dlog( logger, "rejected block ${id}", ("id", id) );
    }
 
-   void dispatch_manager::bcast_transaction(const packed_transaction_ptr& trx) {
+   void dispatch_manager::bcast_transaction( const packed_transaction_ptr& trx ) 
+   {
       trx_buffer_factory buff_factory;
-      const auto now = fc::time_point::now();
-      for_each_connection( [this, &trx, &now, &buff_factory]( auto& cp ) {
-         if( cp->is_blocks_only_connection() || !cp->current() ) {
-            return true;
-         }
-         if( !add_peer_txn(trx->id(), trx->expiration(), cp->connection_id, now) ) {
-            return true;
-         }
 
-         send_buffer_type sb = buff_factory.get_send_buffer( trx );
-         fc_dlog( logger, "sending trx: ${id}, to connection ${cid}", ("id", trx->id())("cid", cp->connection_id) );
-         cp->strand.post( [cp, sb{std::move(sb)}]() {
-            cp->enqueue_buffer( sb, no_reason );
-         } );
-         return true;
-      } );
+      const auto now = fc::time_point::now();
+
+      for_each_connection
+      ( [ this, 
+          & trx, 
+          & now, 
+          & buff_factory
+        ]( auto& cp ) 
+        {
+           if ( cp->is_blocks_only_connection( )
+                ||
+                ! cp->current()
+              )
+           {
+              return true;
+           }
+
+           if ( ! add_peer_txn( trx->id( ),
+                                trx->expiration( ),
+                                cp->connection_id,
+                                now
+                              )
+              )
+           {
+              return true;
+           }
+
+           send_buffer_type sb = buff_factory.get_send_buffer( trx );
+
+           fc_dlog( logger, "sending trx: ${id}, to connection ${cid}", ("id", trx->id())("cid", cp->connection_id) );
+
+           cp->strand.post( [ cp,
+                              sb{ std::move( sb ) }
+                            ]( )
+                            {
+                                cp->enqueue_buffer( sb, no_reason );
+                            }
+                          );
+
+           return true;
+        }
+      );
    }
 
    void dispatch_manager::rejected_transaction(const packed_transaction_ptr& trx, uint32_t head_blk_num) {
