@@ -60,7 +60,7 @@ namespace eosio { namespace chain { namespace plugin_interface {
                                                         bool, 
                                                         bool, 
                                                         bool, 
-                                                        next_function<transaction_trace_ptr>
+                                                        next_function< transaction_trace_ptr >
                                                       ),
                                                   first_provider_policy
                                                 >;

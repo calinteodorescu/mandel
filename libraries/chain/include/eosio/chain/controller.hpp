@@ -59,9 +59,11 @@ namespace eosio { namespace chain {
       LIGHT
    };
 
-   class controller {
-      public:
-         struct config {
+   class controller 
+   {
+   public:
+         struct config 
+         {
             flat_set<account_name>   sender_bypass_whiteblacklist;
             flat_set<account_name>   actor_whitelist;
             flat_set<account_name>   actor_blacklist;
@@ -104,11 +106,12 @@ namespace eosio { namespace chain {
             flat_set<account_name>   profile_accounts;
          };
 
-         enum class block_status {
+         enum class block_status 
+         {
             irreversible = 0, ///< this block has already been applied before by this node and is considered irreversible
-            validated   = 1, ///< this is a complete block signed by a valid producer and has been previously applied by this node and therefore validated but it is not yet irreversible
-            complete   = 2, ///< this is a complete block signed by a valid producer but is not yet irreversible nor has it yet been applied by this node
-            incomplete  = 3, ///< this is an incomplete block (either being produced by a producer or speculatively produced by a node)
+            validated    = 1, ///< this is a complete block signed by a valid producer and has been previously applied by this node and therefore validated but it is not yet irreversible
+            complete     = 2, ///< this is a complete block signed by a valid producer but is not yet irreversible nor has it yet been applied by this node
+            incomplete   = 3, ///< this is an incomplete block (either being produced by a producer or speculatively produced by a node)
          };
 
          controller( const config& cfg, const chain_id_type& chain_id );

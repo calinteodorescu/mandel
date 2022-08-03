@@ -3,7 +3,8 @@
 #include <eosio/chain/block_state.hpp>
 #include <eosio/chain/trace.hpp>
 
-namespace eosio::chain_apis {
+namespace eosio::chain_apis
+{
 
 template<typename T>
 using next_function = std::function<void(const std::variant<fc::exception_ptr, T>&)>;
@@ -16,7 +17,8 @@ using next_function = std::function<void(const std::variant<fc::exception_ptr, T
  * If the transaction is only executed only in a final signed block, then it will not be seen
  * as executed and will expire.
  */
-class trx_retry_db {
+class trx_retry_db 
+{
 public:
 
    /**
