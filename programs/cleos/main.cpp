@@ -1855,23 +1855,48 @@ struct canceldelay_subcommand {
    }
 };
 
-struct deposit_subcommand {
+struct deposit_subcommand 
+{
    string owner_str;
    string amount_str;
+
    const name act_name{ "deposit"_n };
 
-   deposit_subcommand(CLI::App* actionRoot) {
-      auto deposit = actionRoot->add_subcommand("deposit", localized("Deposit into owner's REX fund by transfering from owner's liquid token balance"));
-      deposit->add_option("owner",  owner_str,  localized("Account which owns the REX fund"))->required();
-      deposit->add_option("amount", amount_str, localized("Amount to be deposited into REX fund"))->required();
-      add_standard_transaction_options_plus_signing(deposit, "owner@active");
-      deposit->callback([this] {
-         fc::variant act_payload = fc::mutable_variant_object()
-            ("owner",  owner_str)
-            ("amount", amount_str);
-         auto accountPermissions = get_account_permissions(tx_permission, {name(owner_str), config::active_name});
-         send_actions({create_action(accountPermissions, config::system_account_name, act_name, act_payload)}, signing_keys_opt.get_keys());
-      });
+   deposit_subcommand( CLI::App* actionRoot )
+   {
+      auto deposit = actionRoot->add_subcommand( "deposit", 
+                                                 localized( "Deposit into owner's REX fund by transfering from owner's liquid token balance" )
+                                               );
+
+      deposit->add_option( "owner",  owner_str,  localized( "Account which owns the REX fund"     ))->required( );
+      deposit->add_option( "amount", amount_str, localized( "Amount to be deposited into REX fund"))->required( );
+
+      add_standard_transaction_options_plus_signing( deposit,
+                                                     "owner@active"
+                                                   );
+      deposit->callback
+               ( [ this ] 
+                 {
+                    fc::variant act_payload = fc::mutable_variant_object( )
+                                              ("owner",  owner_str)
+                                              ("amount", amount_str)
+                    ;
+                    auto accountPermissions = get_account_permissions( tx_permission,
+                                                                       { name(owner_str), 
+                                                                         config::active_name
+                                                                       }
+                                                                     );
+                    send_actions( { create_action( accountPermissions,
+                                                   config::system_account_name, 
+                                                   act_name, 
+                                                   act_payload
+                                                 )
+                                  }
+                                  ,
+                                  signing_keys_opt.get_keys()
+                                );
+                 }
+               );
    }
 };
 
@@ -2704,13 +2729,18 @@ CLI::callback_t header_opt_callback = [](CLI::results_t res) {
    return true;
 };
 
-int main( int argc, char** argv ) {
+int main( int argc, char** argv ) 
+{
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
-   context = eosio::client::http::create_http_context();
+
+   context = eosio::client::http::create_http_context( );
+
    wallet_url = default_wallet_url;
 
-   CLI::App app{"Command Line Interface to EOSIO Client"};
-   app.require_subcommand();
+   CLI::App app{ "Command Line Interface to EOSIO Client" };
+
+   app.require_subcommand( );
+
    // Hide obsolete options by putting them into a group with an empty name.
    app.add_option( "-H,--host", obsoleted_option_host_port, localized("The host where ${n} is running", ("n", node_executable_name)) )->group("");
    app.add_option( "-p,--port", obsoleted_option_host_port, localized("The port where ${n} is running", ("n", node_executable_name)) )->group("");

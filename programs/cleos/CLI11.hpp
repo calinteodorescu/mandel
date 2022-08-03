@@ -64,17 +64,12 @@
 
 // Verbatim copy from CLI/Version.hpp:
 
-
 #define CLI11_VERSION_MAJOR 1
 #define CLI11_VERSION_MINOR 9
 #define CLI11_VERSION_PATCH 0
 #define CLI11_VERSION "1.9.0"
 
-
-
-
 // Verbatim copy from CLI/Macros.hpp:
-
 
 // The following version macro is very similar to the one in PyBind11
 #if !(defined(_MSC_VER) && __cplusplus == 199711L) && !defined(__INTEL_COMPILER)
@@ -4855,12 +4850,17 @@ class App {
     /// it is not possible to overload on std::function (fixed in c++14
     /// and backported to c++11 on newer compilers). Use capture by reference
     /// to get a pointer to App if needed.
-    App *callback(std::function<void()> app_callback) {
-        if(immediate_callback_) {
-            parse_complete_callback_ = std::move(app_callback);
-        } else {
-            final_callback_ = std::move(app_callback);
+    App* callback( std::function< void( ) > app_callback ) 
+    {
+        if ( immediate_callback_ ) 
+        {
+            parse_complete_callback_ = std::move( app_callback );
         }
+        else
+        {
+            final_callback_ = std::move( app_callback );
+        }
+
         return this;
     }
 
@@ -5812,22 +5812,25 @@ class App {
 
     /// The real work is done here. Expects a reversed vector.
     /// Changes the vector to the remaining options.
-    void parse(std::vector<std::string> &args) {
+    void parse(std::vector<std::string> &args) 
+    {
         // Clear if parsed
-        if(parsed_ > 0)
+        if ( parsed_ > 0 )
             clear();
 
         // parsed_ is incremented in commands/subcommands,
         // but placed here to make sure this is cleared when
         // running parse after an error is thrown, even by _validate or _configure.
         parsed_ = 1;
-        _validate();
+
+        _validate ();
         _configure();
         // set the parent as nullptr as this object should be the top now
         parent_ = nullptr;
         parsed_ = 0;
 
         _parse(args);
+
         run_callback();
     }
 
@@ -6436,27 +6439,49 @@ class App {
         }
     }
     /// Internal function to run (App) callback, bottom up
-    void run_callback(bool final_mode = false) {
-        pre_callback();
+    void run_callback( bool final_mode = false ) 
+    {
+        pre_callback( );
+
         // in the main app if immediate_callback_ is set it runs the main callback before the used subcommands
-        if(!final_mode && parse_complete_callback_) {
+        if ( ! final_mode 
+             &&
+             parse_complete_callback_
+           ) 
+        {
             parse_complete_callback_();
         }
+
         // run the callbacks for the received subcommands
-        for(App *subc : get_subcommands()) {
-            subc->run_callback(true);
+        for( App* subc : get_subcommands( ) )
+        {
+            subc->run_callback( true );
         }
+
         // now run callbacks for option_groups
-        for(auto &subc : subcommands_) {
-            if(subc->name_.empty() && subc->count_all() > 0) {
-                subc->run_callback(true);
+        for( auto& subc : subcommands_ )
+        {
+            if ( subc->name_.empty( )
+                 &&
+                 subc->count_all() > 0
+               ) 
+            {
+                subc->run_callback( true );
             }
         }
 
         // finally run the main callback
-        if(final_callback_ && (parsed_ > 0)) {
-            if(!name_.empty() || count_all() > 0) {
-                final_callback_();
+        if ( final_callback_ 
+             &&
+             ( parsed_ > 0 )
+           )
+        {
+            if ( ! name_.empty( )
+                 ||
+                 count_all( ) > 0
+               )
+            {
+                final_callback_( );
             }
         }
     }

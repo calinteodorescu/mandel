@@ -6368,9 +6368,6 @@
     <ClInclude Include="plugins\wallet_plugin\include\eosio\wallet_plugin\yubihsm_wallet.hpp">
       <Filter>%2a%2a Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="programs\cleos\CLI11.hpp">
-      <Filter>%2a%2a Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="programs\cleos\help_text.hpp">
       <Filter>%2a%2a Header Files</Filter>
     </ClInclude>
@@ -6841,6 +6838,9 @@
     </ClInclude>
     <ClInclude Include="unittests\test-contracts\test_api_multi_index\test_api_multi_index.hpp">
       <Filter>%2a%2a Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="programs\cleos\CLI11.hpp">
+      <Filter>%2a%2a%2a Programs\cleos</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

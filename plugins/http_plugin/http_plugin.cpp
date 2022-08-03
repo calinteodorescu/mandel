@@ -848,101 +848,146 @@ class http_plugin_impl : public std::enable_shared_from_this<http_plugin_impl> {
       } FC_LOG_AND_RETHROW()
    }
 
-   void http_plugin::plugin_startup() {
+   void http_plugin::plugin_startup() 
+   {
+      handle_sighup( ); // setup logging
 
-      handle_sighup(); // setup logging
-      app().post(appbase::priority::high, [this] ()
-      {
-         try {
-            my->thread_pool.emplace( "http", my->thread_pool_size );
-            if(my->listen_endpoint) {
-               try {
-                  my->create_server_for_endpoint(*my->listen_endpoint, my->server);
+      app( ).post( appbase::priority::high,
+                   [ this ]
+                   ( )
+                   {
+                      try 
+                      {
+                         my->thread_pool.emplace( "http", my->thread_pool_size );
+                         if(my->listen_endpoint) 
+                         {
+                            try 
+                            {
+                               my->create_server_for_endpoint(*my->listen_endpoint, my->server);
 
-                  fc_ilog( logger, "start listening for http requests" );
-                  my->server.listen(*my->listen_endpoint);
-                  my->server.start_accept();
-               } catch ( const fc::exception& e ){
-                  fc_elog( logger, "http service failed to start: ${e}", ("e", e.to_detail_string()) );
-                  throw;
-               } catch ( const std::exception& e ){
-                  fc_elog( logger, "http service failed to start: ${e}", ("e", e.what()) );
-                  throw;
-               } catch (...) {
-                  fc_elog( logger, "error thrown from http io service" );
-                  throw;
-               }
-            }
+                               fc_ilog( logger, "start listening for http requests" );
+                               my->server.listen(*my->listen_endpoint);
+                               my->server.start_accept();
+                            } 
+                            catch ( const fc::exception& e ){
+                               fc_elog( logger, "http service failed to start: ${e}", ("e", e.to_detail_string()) );
+                               throw;
+                            } 
+                            catch ( const std::exception& e ){
+                               fc_elog( logger, "http service failed to start: ${e}", ("e", e.what()) );
+                               throw;
+                            } 
+                            catch (...) {
+                               fc_elog( logger, "error thrown from http io service" );
+                               throw;
+                            }
+                         }
 
-            if(my->unix_endpoint) {
-               try {
-                  my->unix_server.clear_access_channels(websocketpp::log::alevel::all);
-                  my->unix_server.init_asio( &my->thread_pool->get_executor() );
-                  my->unix_server.set_max_http_body_size(my->max_body_size);
-                  my->unix_server.listen(*my->unix_endpoint);
-                  // captures `this`, my needs to live as long as unix_server is handling requests
-                  my->unix_server.set_http_handler([this](connection_hdl hdl) {
-                     my->handle_http_request<detail::asio_local_with_stub_log>( my->unix_server.get_con_from_hdl(std::move(hdl)));
-                  });
-                  my->unix_server.start_accept();
-               } catch ( const fc::exception& e ){
-                  fc_elog( logger, "unix socket service (${path}) failed to start: ${e}", ("e", e.to_detail_string())("path",my->unix_endpoint->path()) );
-                  throw;
-               } catch ( const std::exception& e ){
-                  fc_elog( logger, "unix socket service (${path}) failed to start: ${e}", ("e", e.what())("path",my->unix_endpoint->path()) );
-                  throw;
-               } catch (...) {
-                  fc_elog( logger, "error thrown from unix socket (${path}) io service", ("path",my->unix_endpoint->path()) );
-                  throw;
-               }
-            }
+                         if (my->unix_endpoint) 
+                         {
+                            try 
+                            {
+                               my->unix_server.clear_access_channels(websocketpp::log::alevel::all);
+                               my->unix_server.init_asio( &my->thread_pool->get_executor() );
+                               my->unix_server.set_max_http_body_size(my->max_body_size);
+                               my->unix_server.listen(*my->unix_endpoint);
+                               // captures `this`, my needs to live as long as unix_server is handling requests
+                               my->unix_server.set_http_handler
+                                               ( [ this ]
+                                                 ( connection_hdl hdl ) 
+                                                 {
+                                                    my->handle_http_request< detail::asio_local_with_stub_log >
+                                                        ( my->unix_server.get_con_from_hdl( std::move( hdl ) )
+                                                        );
+                                                 }               
+                                               );
 
-            if(my->https_listen_endpoint) {
-               try {
-                  my->create_server_for_endpoint(*my->https_listen_endpoint, my->https_server);
-                  my->https_server.set_tls_init_handler([this](const websocketpp::connection_hdl& hdl) -> ssl_context_ptr{
-                     return my->on_tls_init();
-                  });
+                               my->unix_server.start_accept();
+                            } 
+                            catch ( const fc::exception& e ){
+                               fc_elog( logger, "unix socket service (${path}) failed to start: ${e}", ("e", e.to_detail_string())("path",my->unix_endpoint->path()) );
+                               throw;
+                            } 
+                            catch ( const std::exception& e ){
+                               fc_elog( logger, "unix socket service (${path}) failed to start: ${e}", ("e", e.what())("path",my->unix_endpoint->path()) );
+                               throw;
+                            } 
+                            catch (...) {
+                               fc_elog( logger, "error thrown from unix socket (${path}) io service", ("path",my->unix_endpoint->path()) );
+                               throw;
+                            }
+                         }
 
-                  fc_ilog( logger, "start listening for https requests" );
-                  my->https_server.listen(*my->https_listen_endpoint);
-                  my->https_server.start_accept();
-               } catch ( const fc::exception& e ){
-                  fc_elog( logger, "https service failed to start: ${e}", ("e", e.to_detail_string()) );
-                  throw;
-               } catch ( const std::exception& e ){
-                  fc_elog( logger, "https service failed to start: ${e}", ("e", e.what()) );
-                  throw;
-               } catch (...) {
-                  fc_elog( logger, "error thrown from https io service" );
-                  throw;
-               }
-            }
+                         if (my->https_listen_endpoint) 
+                         {
+                            try 
+                            {
+                               my->create_server_for_endpoint(*my->https_listen_endpoint, my->https_server);
+                               my->https_server.set_tls_init_handler
+                                                ( [ this ]
+                                                  ( const websocketpp::connection_hdl& hdl )
+                                                  -> ssl_context_ptr
+                                                  {
+                                                        return my->on_tls_init( );
+                                                  }
+                                                );
 
-            add_api({{
-               std::string("/v1/node/get_supported_apis"),
-               [&](const string&, string body, url_response_callback cb) mutable {
-                  try {
-                     if (body.empty()) body = "{}";
-                     auto result = (*this).get_supported_apis();
-                     cb(200, fc::variant(result));
-                  } catch (...) {
-                     handle_exception("node", "get_supported_apis", body, cb);
-                  }
-               }
-            }});
-         } catch (...) {
-            fc_elog(logger, "http_plugin startup fails, shutting down");
-            app().shutdown();
-         }
-      });
+                               fc_ilog( logger, "start listening for https requests" );
+                               my->https_server.listen(*my->https_listen_endpoint);
+                               my->https_server.start_accept();
+                            } 
+                            catch ( const fc::exception& e ){
+                               fc_elog( logger, "https service failed to start: ${e}", ("e", e.to_detail_string()) );
+                               throw;
+                            } 
+                            catch ( const std::exception& e ){
+                               fc_elog( logger, "https service failed to start: ${e}", ("e", e.what()) );
+                               throw;
+                            } 
+                            catch (...) {
+                               fc_elog( logger, "error thrown from https io service" );
+                               throw;
+                            }
+                         }
+
+                         add_api( {
+                                    {
+                                        std::string("/v1/node/get_supported_apis"),
+                                        [ & ]
+                                        ( const string&, 
+                                          string                body, 
+                                          url_response_callback cb
+                                        ) mutable 
+                                        {
+                                            try
+                                            {
+                                                if (body.empty()) body = "{}";
+                                                auto result = (*this).get_supported_apis();
+                                                cb(200, fc::variant(result));
+                                            }
+                                            catch (...) {
+                                                handle_exception("node", "get_supported_apis", body, cb);
+                                            }
+                                        }
+                                    }
+                                  }
+                                );
+                      } 
+                      catch (...) {
+                         fc_elog(logger, "http_plugin startup fails, shutting down");
+                         app().shutdown();
+                      }
+                   }
+                 );
    }
 
-   void http_plugin::handle_sighup() {
+   void http_plugin::handle_sighup() 
+   {
       fc::logger::update( logger_name, logger );
    }
 
-   void http_plugin::plugin_shutdown() {
+   void http_plugin::plugin_shutdown() 
+   {
       if(my->server.is_listening())
          my->server.stop_listening();
       if(my->https_server.is_listening())
@@ -950,7 +995,8 @@ class http_plugin_impl : public std::enable_shared_from_this<http_plugin_impl> {
       if(my->unix_server.is_listening())
          my->unix_server.stop_listening();
 
-      if( my->thread_pool ) {
+      if( my->thread_pool ) 
+      {
          my->thread_pool->stop();
          my->thread_pool.reset();
       }
