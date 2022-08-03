@@ -136,15 +136,17 @@ using boost::signals2::scoped_connection;
 class chain_plugin_impl {
 public:
    chain_plugin_impl()
-   :pre_accepted_block_channel(app().get_channel<channels::pre_accepted_block>())
-   ,accepted_block_header_channel(app().get_channel<channels::accepted_block_header>())
-   ,accepted_block_channel(app().get_channel<channels::accepted_block>())
-   ,irreversible_block_channel(app().get_channel<channels::irreversible_block>())
-   ,accepted_transaction_channel(app().get_channel<channels::accepted_transaction>())
-   ,applied_transaction_channel(app().get_channel<channels::applied_transaction>())
-   ,incoming_block_channel(app().get_channel<incoming::channels::block>())
-   ,incoming_block_sync_method(app().get_method<incoming::methods::block_sync>())
-   ,incoming_transaction_async_method(app().get_method<incoming::methods::transaction_async>())
+   :    pre_accepted_block_channel       (app().get_channel<channels::          pre_accepted_block>   ())
+   ,    accepted_block_header_channel    (app().get_channel<channels::          accepted_block_header>())
+   ,    accepted_block_channel           (app().get_channel<channels::          accepted_block>       ())
+   ,    irreversible_block_channel       (app().get_channel<channels::          irreversible_block>   ())
+   ,    accepted_transaction_channel     (app().get_channel<channels::          accepted_transaction> ())
+   ,    applied_transaction_channel      (app().get_channel<channels::          applied_transaction>  ())
+
+   ,    incoming_block_channel           (app().get_channel<incoming::channels::block>                ())
+
+   ,    incoming_block_sync_method       (app().get_method<incoming::methods::  block_sync>           ())
+   ,    incoming_transaction_async_method(app().get_method<incoming::methods::  transaction_async>    ())
    {}
 
    bfs::path                        blocks_dir;
@@ -164,23 +166,23 @@ public:
 
 
    // retained references to channels for easy publication
-   channels::pre_accepted_block::channel_type&     pre_accepted_block_channel;
-   channels::accepted_block_header::channel_type&  accepted_block_header_channel;
-   channels::accepted_block::channel_type&         accepted_block_channel;
-   channels::irreversible_block::channel_type&     irreversible_block_channel;
-   channels::accepted_transaction::channel_type&   accepted_transaction_channel;
-   channels::applied_transaction::channel_type&    applied_transaction_channel;
-   incoming::channels::block::channel_type&        incoming_block_channel;
+   plugin_interface::channels::pre_accepted_block::channel_type&     pre_accepted_block_channel;
+   plugin_interface::channels::accepted_block_header::channel_type&  accepted_block_header_channel;
+   plugin_interface::channels::accepted_block::channel_type&         accepted_block_channel;
+   plugin_interface::channels::irreversible_block::channel_type&     irreversible_block_channel;
+   plugin_interface::channels::accepted_transaction::channel_type&   accepted_transaction_channel;
+   plugin_interface::channels::applied_transaction::channel_type&    applied_transaction_channel;
+   plugin_interface::incoming::channels::block::channel_type&        incoming_block_channel;
 
    // retained references to methods for easy calling
-   incoming::methods::block_sync::method_type&        incoming_block_sync_method;
-   incoming::methods::transaction_async::method_type& incoming_transaction_async_method;
+   plugin_interface::incoming::methods::block_sync::method_type&        incoming_block_sync_method;
+   plugin_interface::incoming::methods::transaction_async::method_type& incoming_transaction_async_method;
 
    // method provider handles
-   methods::get_block_by_number::method_type::handle                 get_block_by_number_provider;
-   methods::get_block_by_id::method_type::handle                     get_block_by_id_provider;
-   methods::get_head_block_id::method_type::handle                   get_head_block_id_provider;
-   methods::get_last_irreversible_block_number::method_type::handle  get_last_irreversible_block_number_provider;
+   plugin_interface::methods::get_block_by_number::method_type::handle                 get_block_by_number_provider;
+   plugin_interface::methods::get_block_by_id::method_type::handle                     get_block_by_id_provider;
+   plugin_interface::methods::get_head_block_id::method_type::handle                   get_head_block_id_provider;
+   plugin_interface::methods::get_last_irreversible_block_number::method_type::handle  get_last_irreversible_block_number_provider;
 
    // scoped connections for chain controller
    std::optional<scoped_connection>                                   pre_accepted_block_connection;
@@ -1347,8 +1349,16 @@ bool chain_plugin::accept_block(const signed_block_ptr& block, const block_id_ty
    return my->incoming_block_sync_method(block, id);
 }
 
-void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {
-   my->incoming_transaction_async_method(trx, false, false, false, std::move(next));
+void chain_plugin::accept_transaction( const chain::packed_transaction_ptr&        trx, 
+                                       next_function<chain::transaction_trace_ptr> next
+                                     ) 
+{
+   my->incoming_transaction_async_method( trx, 
+                                          false, 
+                                          false, 
+                                          false, 
+                                          std::move(next)
+                                        );
 }
 
 controller& chain_plugin::chain() { return *my->chain; }
