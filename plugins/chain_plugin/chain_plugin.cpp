@@ -133,7 +133,8 @@ using fc::flat_map;
 
 using boost::signals2::scoped_connection;
 
-class chain_plugin_impl {
+class chain_plugin_impl 
+{
 public:
    chain_plugin_impl()
    :    pre_accepted_block_channel       (app().get_channel<channels::          pre_accepted_block>   ())
@@ -150,9 +151,9 @@ public:
    {}
 
    bfs::path                        blocks_dir;
-   bool                             readonly = false;
+   bool                             readonly                = false;
    flat_map<uint32_t,block_id_type> loaded_checkpoints;
-   bool                             accept_transactions = false;
+   bool                             accept_transactions     = false;
    bool                             api_accept_transactions = true;
    bool                             account_queries_enabled = false;
 
@@ -1357,7 +1358,7 @@ void chain_plugin::accept_transaction( const chain::packed_transaction_ptr&     
                                           false, 
                                           false, 
                                           false, 
-                                          std::move(next)
+                                          std::move( next )
                                         );
 }
 

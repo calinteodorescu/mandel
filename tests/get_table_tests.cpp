@@ -34,8 +34,7 @@ using namespace fc;
 
 BOOST_AUTO_TEST_SUITE(get_table_tests)
 
-transaction_trace_ptr
-issue_tokens( TESTER& t, account_name issuer, account_name to, const asset& amount,
+transaction_trace_ptr issue_tokens( TESTER& t, account_name issuer, account_name to, const asset& amount,
               std::string memo = "", account_name token_contract = "eosio.token"_n )
 {
    signed_transaction trx;

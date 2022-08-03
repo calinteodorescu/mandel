@@ -127,60 +127,71 @@ namespace eosio { namespace chain {
                                                     bool allow_duplicate_keys = false )const;
    };
 
-   struct packed_transaction : fc::reflect_init {
-      enum class compression_type {
+   struct packed_transaction : fc::reflect_init
+   {
+      enum class compression_type 
+      {
          none = 0,
          zlib = 1,
       };
 
-      packed_transaction() = default;
-      packed_transaction(packed_transaction&&) = default;
-      explicit packed_transaction(const packed_transaction&) = default;
+      packed_transaction()                                     = default;
+      packed_transaction(packed_transaction&&)                 = default;
+      explicit packed_transaction(const packed_transaction&)   = default;
       packed_transaction& operator=(const packed_transaction&) = delete;
-      packed_transaction& operator=(packed_transaction&&) = default;
+      packed_transaction& operator=(packed_transaction&&)      = default;
 
-      explicit packed_transaction(const signed_transaction& t, compression_type _compression = compression_type::none)
-      :signatures(t.signatures), compression(_compression), unpacked_trx(t), trx_id(unpacked_trx.id())
+      explicit packed_transaction( const signed_transaction& t, 
+                                   compression_type          _compression = compression_type::none
+                                 )
+      :     signatures  ( t.signatures ),
+            compression ( _compression ), 
+            unpacked_trx( t ),
+            trx_id      ( unpacked_trx.id( ) )
       {
-         local_pack_transaction();
+         local_pack_transaction      ();
          local_pack_context_free_data();
       }
 
       explicit packed_transaction(signed_transaction&& t, compression_type _compression = compression_type::none)
       :signatures(t.signatures), compression(_compression), unpacked_trx(std::move(t)), trx_id(unpacked_trx.id())
       {
-         local_pack_transaction();
+         local_pack_transaction      ();
          local_pack_context_free_data();
       }
 
       // used by abi_serializer
-      packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
-      packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd, compression_type _compression );
-      packed_transaction( transaction&& t, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
+      packed_transaction( bytes&&       packed_txn, vector<signature_type>&& sigs, bytes&&         packed_cfd, compression_type _compression );
+      packed_transaction( bytes&&       packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd,        compression_type _compression );
+      packed_transaction( transaction&& t,          vector<signature_type>&& sigs, bytes&&         packed_cfd, compression_type _compression );
 
-      friend bool operator==(const packed_transaction& lhs, const packed_transaction& rhs) {
+      friend bool operator==(const packed_transaction& lhs, const packed_transaction& rhs) 
+      {
          return std::tie(lhs.signatures, lhs.compression, lhs.packed_context_free_data, lhs.packed_trx) ==
                 std::tie(rhs.signatures, rhs.compression, rhs.packed_context_free_data, rhs.packed_trx);
       }
-      friend bool operator!=(const packed_transaction& lhs, const packed_transaction& rhs) { return !(lhs == rhs); }
+      friend bool operator!=(const packed_transaction& lhs, const packed_transaction& rhs) 
+      { 
+          return !(lhs == rhs);
+      }
 
       uint32_t get_unprunable_size()const;
-      uint32_t get_prunable_size()const;
-      size_t get_estimated_size()const;
+      uint32_t get_prunable_size  ()const;
+      size_t   get_estimated_size ()const;
 
-      digest_type packed_digest()const;
+      digest_type packed_digest   ()const;
 
       const transaction_id_type& id()const { return trx_id; }
       bytes               get_raw_transaction()const;
 
-      time_point_sec                expiration()const { return unpacked_trx.expiration; }
-      const vector<bytes>&          get_context_free_data()const { return unpacked_trx.context_free_data; }
-      const transaction&            get_transaction()const { return unpacked_trx; }
-      const signed_transaction&     get_signed_transaction()const { return unpacked_trx; }
-      const vector<signature_type>& get_signatures()const { return signatures; }
-      const fc::enum_type<uint8_t,compression_type>& get_compression()const { return compression; }
-      const bytes&                  get_packed_context_free_data()const { return packed_context_free_data; }
-      const bytes&                  get_packed_transaction()const { return packed_trx; }
+      time_point_sec                                 expiration                  ()const { return unpacked_trx.expiration; }
+      const vector<bytes>&                           get_context_free_data       ()const { return unpacked_trx.context_free_data; }
+      const transaction&                             get_transaction             ()const { return unpacked_trx; }
+      const signed_transaction&                      get_signed_transaction      ()const { return unpacked_trx; }
+      const vector<signature_type>&                  get_signatures              ()const { return signatures; }
+      const fc::enum_type<uint8_t,compression_type>& get_compression             ()const { return compression; }
+      const bytes&                                   get_packed_context_free_data()const { return packed_context_free_data; }
+      const bytes&                                   get_packed_transaction      ()const { return packed_trx; }
 
    private:
       void local_unpack_transaction(vector<bytes>&& context_free_data);

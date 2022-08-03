@@ -3098,45 +3098,78 @@ namespace eosio {
       }
    }
 
-   size_t calc_trx_size( const packed_transaction_ptr& trx ) {
-      return trx->get_estimated_size();
+   size_t calc_trx_size( const packed_transaction_ptr& trx ) 
+   {
+      return trx->get_estimated_size( );
    }
 
-   void connection::handle_message( packed_transaction_ptr trx ) {
+   void connection::handle_message( packed_transaction_ptr trx ) 
+   {
       const auto& tid = trx->id();
       peer_dlog( this, "received packed_transaction ${id}", ("id", tid) );
 
       trx_in_progress_size += calc_trx_size( trx );
-      my_impl->chain_plug->accept_transaction( trx,
-         [weak = weak_from_this(), trx](const std::variant<fc::exception_ptr, transaction_trace_ptr>& result) mutable {
-         // next (this lambda) called from application thread
-         if (std::holds_alternative<fc::exception_ptr>(result)) {
-            fc_dlog( logger, "bad packed_transaction : ${m}", ("m", std::get<fc::exception_ptr>(result)->what()) );
-         } else {
-            const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>(result);
-            if( !trace->except ) {
-               fc_dlog( logger, "chain accepted transaction, bcast ${id}", ("id", trace->id) );
-            } else {
-               fc_elog( logger, "bad packed_transaction : ${m}", ("m", trace->except->what()));
-            }
-         }
-         connection_ptr conn = weak.lock();
-         if( conn ) {
-            conn->trx_in_progress_size -= calc_trx_size( trx );
-         }
-      });
+      my_impl->chain_plug->accept_transaction
+                           ( trx,
+                             [ weak = weak_from_this( ),
+                               trx
+                             ]
+                             ( const std::variant< fc::exception_ptr, 
+                                                   transaction_trace_ptr
+                                                 >& result
+                             ) mutable 
+                             {
+                                // next (this lambda) called from application thread
+                                if ( std::holds_alternative< fc::exception_ptr >( result ) )
+                                {
+                                   fc_dlog( logger, "bad packed_transaction : ${m}", ("m", std::get<fc::exception_ptr>(result)->what()) );
+                                } 
+                                else
+                                {
+                                   const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>( result );
+                                   if ( ! trace->except )
+                                   {
+                                      fc_dlog( logger, "chain accepted transaction, bcast ${id}", ("id", trace->id) );
+                                   } 
+                                   else
+                                   {
+                                      fc_elog( logger, "bad packed_transaction : ${m}", ("m", trace->except->what()));
+                                   }
+                                }
+                           
+                                connection_ptr conn = weak.lock();
+                                if( conn ) 
+                                {
+                                   conn->trx_in_progress_size -= calc_trx_size( trx );
+                                }
+                             }
+                           );
    }
 
    // called from connection strand
-   void connection::handle_message( const block_id_type& id, signed_block_ptr ptr ) {
+   void connection::handle_message( const block_id_type& id, 
+                                    signed_block_ptr     ptr
+                                  ) 
+   {
       peer_dlog( this, "received signed_block ${num}, id ${id}", ("num", ptr->block_num())("id", id) );
-      app().post(priority::medium, [ptr{std::move(ptr)}, id, c = shared_from_this()]() mutable {
-         c->process_signed_block( id, std::move( ptr ) );
-      });
+
+      app().post( priority::medium, 
+                  [ ptr{ std::move( ptr ) },
+                    id,
+                    c = shared_from_this( )
+                  ]
+                  ( ) mutable
+                  {
+                        c->process_signed_block( id,
+                                                 std::move( ptr )
+                                               );
+                  }
+                );
    }
 
    // called from application thread
-   void connection::process_signed_block( const block_id_type& blk_id, signed_block_ptr msg ) {
+   void connection::process_signed_block( const block_id_type& blk_id, signed_block_ptr msg ) 
+   {
       controller& cc = my_impl->chain_plug->chain();
       uint32_t blk_num = msg->block_num();
       // use c in this method instead of this to highlight that all methods called on c-> must be thread safe
@@ -3146,16 +3179,24 @@ namespace eosio {
       if( !c->socket_is_open() )
          return;
 
-      try {
-         if( cc.fetch_block_by_id(blk_id) ) {
-            c->strand.post( [sync_master = my_impl->sync_master.get(),
-                             dispatcher = my_impl->dispatcher.get(), c, blk_id, blk_num]() {
-               dispatcher->add_peer_block( blk_id, c->connection_id );
-               sync_master->sync_recv_block( c, blk_id, blk_num, false );
-            });
+      try 
+      {
+         if( cc.fetch_block_by_id(blk_id) ) 
+         {
+            c->strand.post( [ sync_master = my_impl->sync_master.get(),
+                              dispatcher  = my_impl->dispatcher. get(), c, blk_id, blk_num
+                            ]
+                            ( )
+                            {
+                               dispatcher ->add_peer_block ( blk_id, c->connection_id );
+                               sync_master->sync_recv_block( c, blk_id, blk_num, false );
+                            }
+                          );
             return;
          }
-      } catch(...) {
+      }
+      catch(...) 
+      {
          // should this even be caught?
          fc_elog( logger, "Caught an unknown exception trying to recall block ID" );
       }
@@ -3165,40 +3206,69 @@ namespace eosio {
                ("n", blk_num)("age", age.to_seconds())("cid", c->connection_id) );
 
       go_away_reason reason = fatal_other;
-      try {
+      try 
+      {
          bool accepted = my_impl->chain_plug->accept_block(msg, blk_id);
          my_impl->update_chain_info();
          if( !accepted ) return;
          reason = no_reason;
-      } catch( const unlinkable_block_exception &ex) {
+      } 
+      catch( const unlinkable_block_exception &ex) 
+      {
          fc_elog(logger, "unlinkable_block_exception connection ${cid}: #${n} ${id}...: ${m}",
                  ("cid", c->connection_id)("n", blk_num)("id", blk_id.str().substr(8,16))("m",ex.to_string()));
          reason = unlinkable;
-      } catch( const block_validate_exception &ex ) {
+      }
+      catch( const block_validate_exception &ex ) 
+      {
          fc_elog(logger, "block_validate_exception connection ${cid}: #${n} ${id}...: ${m}",
                  ("cid", c->connection_id)("n", blk_num)("id", blk_id.str().substr(8,16))("m",ex.to_string()));
          reason = validation;
-      } catch( const assert_exception &ex ) {
+      } 
+      catch( const assert_exception &ex ) 
+      {
          fc_elog(logger, "block assert_exception connection ${cid}: #${n} ${id}...: ${m}",
                  ("cid", c->connection_id)("n", blk_num)("id", blk_id.str().substr(8,16))("m",ex.to_string()));
-      } catch( const fc::exception &ex ) {
+      } 
+      catch( const fc::exception &ex ) 
+      {
          fc_elog(logger, "bad block exception connection ${cid}: #${n} ${id}...: ${m}",
                  ("cid", c->connection_id)("n", blk_num)("id", blk_id.str().substr(8,16))("m",ex.to_string()));
-      } catch( ... ) {
+      } 
+      catch( ... ) 
+      {
          fc_elog(logger, "bad block connection ${cid}: #${n} ${id}...: unknown exception",
                  ("cid", c->connection_id)("n", blk_num)("id", blk_id.str().substr(8,16)));
       }
 
-      if( reason == no_reason ) {
-         boost::asio::post( my_impl->thread_pool->get_executor(), [dispatcher = my_impl->dispatcher.get(), cid=c->connection_id, blk_id, msg]() {
-            fc_dlog( logger, "accepted signed_block : #${n} ${id}...", ("n", msg->block_num())("id", blk_id.str().substr(8,16)) );
-            dispatcher->add_peer_block( blk_id, cid );
-         });
-         c->strand.post( [sync_master = my_impl->sync_master.get(), dispatcher = my_impl->dispatcher.get(), c, blk_id, blk_num]() {
-            dispatcher->recv_block( c, blk_id, blk_num );
-            sync_master->sync_recv_block( c, blk_id, blk_num, true );
-         });
-      } else {
+      if( reason == no_reason ) 
+      {
+         boost::asio::post( my_impl->thread_pool->get_executor(), 
+                            [ dispatcher = my_impl->dispatcher.get(), cid=c->connection_id, blk_id, msg
+                            ]
+                            ( )
+                            {
+                                fc_dlog( logger, "accepted signed_block : #${n} ${id}...", ("n", msg->block_num())("id", blk_id.str().substr(8,16)) );
+
+                                dispatcher->add_peer_block( blk_id, cid );
+                            }
+                          );
+
+         c->strand.post( [ sync_master = my_impl->sync_master.get(), 
+                           dispatcher  = my_impl->dispatcher.get(), 
+                           c, 
+                           blk_id, 
+                           blk_num
+                         ]
+                         ( )
+                         {
+                            dispatcher ->recv_block     ( c, blk_id, blk_num );
+                            sync_master->sync_recv_block( c, blk_id, blk_num, true );
+                         }
+                       );
+      } 
+      else 
+      {
          c->strand.post( [sync_master = my_impl->sync_master.get(), dispatcher = my_impl->dispatcher.get(), c, blk_id, blk_num]() {
             sync_master->rejected_block( c, blk_num );
             dispatcher->rejected_block( blk_id );
