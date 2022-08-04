@@ -419,7 +419,7 @@ struct controller_impl {
                fork_db.mark_valid( head );
             }
 
-            emit( self.irreversible_block, *bitr );
+            controller_impl::emit( self.irreversible_block, *bitr );
 
             // blog.append could fail due to failures like running out of space.
             // Do it before commit so that in case it throws, DB can be rolled back.
@@ -1288,9 +1288,9 @@ struct controller_impl {
          trace->scheduled = true;
          trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::expired, billed_cpu_time_us, 0 ); // expire the transaction
          trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
-         emit( self.accepted_transaction, trx );
+         controller_impl::emit( self.accepted_transaction, trx );
          dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
+         controller_impl::emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
          undo_session.squash();
          return trace;
       }
@@ -1353,9 +1353,9 @@ struct controller_impl {
 
          trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
 
-         emit( self.accepted_transaction, trx );
+         controller_impl::emit( self.accepted_transaction, trx );
          dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
+         controller_impl::emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
 
          trx_context.squash();
          undo_session.squash();
@@ -1392,9 +1392,9 @@ struct controller_impl {
          trace = error_trace;
          if( !trace->except_ptr ) {
             trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
-            emit( self.accepted_transaction, trx );
+            controller_impl::emit( self.accepted_transaction, trx );
             dmlog_applied_transaction(trace);
-            emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
+            controller_impl::emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
             undo_session.squash();
             return trace;
          }
@@ -1434,15 +1434,15 @@ struct controller_impl {
          trace->receipt = push_receipt(gtrx.trx_id, transaction_receipt::hard_fail, cpu_time_to_bill_us, 0);
          trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
 
-         emit( self.accepted_transaction, trx );
+         controller_impl::emit( self.accepted_transaction, trx );
          dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
+         controller_impl::emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
 
          undo_session.squash();
       } else {
-         emit( self.accepted_transaction, trx );
+         controller_impl::emit( self.accepted_transaction, trx );
          dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
+         controller_impl::emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
       }
 
       return trace;
@@ -1571,11 +1571,11 @@ struct controller_impl {
             if (!trx->read_only) {
                 if (!trx->accepted) {
                     trx->accepted = true;
-                    emit(self.accepted_transaction, trx);
+                    controller_impl::emit(self.accepted_transaction, trx);
                 }
 
                 dmlog_applied_transaction(trace);
-                emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
+                controller_impl::emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
             }
 
 
@@ -1604,9 +1604,9 @@ struct controller_impl {
          }
 
          if (!trx->read_only) {
-             emit(self.accepted_transaction, trx);
+             controller_impl::emit(self.accepted_transaction, trx);
              dmlog_applied_transaction(trace);
-             emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
+             controller_impl::emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
          }
 
          return trace;
@@ -1622,7 +1622,7 @@ struct controller_impl {
    {
       EOS_ASSERT( !pending, block_validate_exception, "pending block already exists" );
 
-      emit( self.block_start, head->block_num + 1 );
+      controller_impl::emit( self.block_start, head->block_num + 1 );
 
       if (auto dm_logger = get_deep_mind_logger()) {
          // The head block represents the block just before this one that is about to start, so add 1 to get this block num
@@ -1870,7 +1870,7 @@ struct controller_impl {
          if( add_to_fork_db ) {
             fork_db.add( bsp );
             fork_db.mark_valid( bsp );
-            emit( self.accepted_block_header, bsp );
+            controller_impl::emit( self.accepted_block_header, bsp );
             head = fork_db.head();
             EOS_ASSERT( bsp == head, fork_database_exception, "committed block did not become the new head in fork database");
          }
@@ -1879,7 +1879,7 @@ struct controller_impl {
             dm_logger->on_accepted_block(bsp);
          }
 
-         emit( self.accepted_block, bsp );
+         controller_impl::emit( self.accepted_block, bsp );
 
          if( add_to_fork_db ) {
             log_irreversible();
@@ -2159,7 +2159,7 @@ struct controller_impl {
             return;
          }
 
-         emit( self.pre_accepted_block, b );
+         controller_impl::emit( self.pre_accepted_block, b );
 
          fork_db.add( bsp );
 
@@ -2167,7 +2167,7 @@ struct controller_impl {
             trusted_producer_light_validation = true;
          };
 
-         emit( self.accepted_block_header, bsp );
+         controller_impl::emit( self.accepted_block_header, bsp );
 
          if( read_mode != db_read_mode::IRREVERSIBLE ) {
             maybe_switch_forks( br, fork_db.pending_head(), s, forked_branch_cb, trx_lookup );
@@ -2194,7 +2194,7 @@ struct controller_impl {
             return;
          }
 
-         emit( self.pre_accepted_block, b );
+         controller_impl::emit( self.pre_accepted_block, b );
          const bool skip_validate_signee = !conf.force_all_checks;
 
          auto bsp = std::make_shared<block_state>(
@@ -2212,7 +2212,7 @@ struct controller_impl {
             fork_db.add( bsp, true );
          }
 
-         emit( self.accepted_block_header, bsp );
+         controller_impl::emit( self.accepted_block_header, bsp );
 
          controller::block_report br;
          if( s == controller::block_status::irreversible ) {
@@ -2220,8 +2220,8 @@ struct controller_impl {
             head = bsp;
 
             // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
-            // So emit it explicitly here.
-            emit( self.irreversible_block, bsp );
+            // So controller_impl::emit it explicitly here.
+            controller_impl::emit( self.irreversible_block, bsp );
 
             if (!self.skip_db_sessions(s)) {
                db.commit(bsp->block_num);
