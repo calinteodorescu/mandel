@@ -1215,10 +1215,13 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
          my->irreversible_block_channel.publish( priority::low, blk );
       } );
 
-      my->accepted_transaction_connection = my->chain->accepted_transaction.connect(
-            [this]( const transaction_metadata_ptr& meta ) {
-               my->accepted_transaction_channel.publish( priority::low, meta );
-            } );
+      my->accepted_transaction_connection = my->chain->accepted_transaction.connect
+                                            (
+                                              [ this ]( const transaction_metadata_ptr& meta ) 
+                                              {
+                                                  my->accepted_transaction_channel.publish( priority::low, meta );
+                                              }
+                                            );
 
       my->applied_transaction_connection = my->chain->applied_transaction.connect(
             [this]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
