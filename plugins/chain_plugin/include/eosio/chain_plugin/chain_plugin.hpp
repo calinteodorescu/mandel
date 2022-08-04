@@ -88,7 +88,7 @@ string convert_to_string(const float128_t& source, const string& key_type, const
 
 
 class read_only {
-   const controller& db;
+   const controller& pdb;
    const std::optional<account_query_db>& aqdb;
    const fc::microseconds abi_serializer_max_time;
    bool  shorten_abi_errors = true;
@@ -98,8 +98,8 @@ class read_only {
 public:
    static const string KEYi64;
 
-   read_only(const controller& db, const std::optional<account_query_db>& aqdb, const fc::microseconds& abi_serializer_max_time, const producer_plugin* producer_plug, const trx_finality_status_processing* trx_finality_status_proc)
-      : db(db), aqdb(aqdb), abi_serializer_max_time(abi_serializer_max_time), producer_plug(producer_plug), trx_finality_status_proc(trx_finality_status_proc) {
+   read_only(const controller& pdb, const std::optional<account_query_db>& aqdb, const fc::microseconds& abi_serializer_max_time, const producer_plugin* producer_plug, const trx_finality_status_processing* trx_finality_status_proc)
+      : db(pdb), aqdb(aqdb), abi_serializer_max_time(abi_serializer_max_time), producer_plug(producer_plug), trx_finality_status_proc(trx_finality_status_proc) {
    }
 
    void validate() const {}
@@ -679,7 +679,8 @@ public:
    get_consensus_parameters_results get_consensus_parameters(const get_consensus_parameters_params&) const;
 };
 
-class read_write {
+class read_write 
+{
    controller& db;
    std::optional<trx_retry_db>& trx_retry;
    const fc::microseconds abi_serializer_max_time;

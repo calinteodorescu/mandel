@@ -2331,7 +2331,7 @@ void read_write::send_transaction( const read_write::send_transaction_params&   
                                                             );
                           } 
                           catch( chain::abi_exception& ) {
-                             output = *trx_trace_ptr;
+                             output = * trx_trace_ptr;
                           }
 
                           const chain::transaction_id_type& id = trx_trace_ptr->id;
@@ -2352,11 +2352,15 @@ void read_write::send_transaction( const read_write::send_transaction_params&   
    CATCH_AND_CALL(next);
 }
 
-void read_write::send_transaction2(const read_write::send_transaction2_params& params, next_function<read_write::send_transaction_results> next) {
-   try {
-      auto ptrx = std::make_shared<packed_transaction>();
+void read_write::send_transaction2( const read_write::send_transaction2_params& params, 
+                                    next_function<read_write::send_transaction_results> next) 
+{
+   try 
+   {
+      auto ptrx     = std::make_shared<packed_transaction>();
       auto resolver = make_resolver(db, abi_serializer::create_yield_function( abi_serializer_max_time ));
-      try {
+      try 
+      {
          abi_serializer::from_variant(params.transaction, *ptrx, resolver, abi_serializer::create_yield_function( abi_serializer_max_time ));
       } EOS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
 
@@ -2368,42 +2372,81 @@ void read_write::send_transaction2(const read_write::send_transaction2_params& p
                   "retry transaction expiration ${e} larger than allowed ${m}",
                   ("e", ptrx->expiration())("m", trx_retry->get_max_expiration_time()) );
 
-      app().get_method<incoming::methods::transaction_async>()(ptrx, true, false, static_cast<bool>(params.return_failure_trace),
-         [this, ptrx, next, retry, retry_num_blocks](const std::variant<fc::exception_ptr, transaction_trace_ptr>& result) -> void {
-            if( std::holds_alternative<fc::exception_ptr>( result ) ) {
-               next( std::get<fc::exception_ptr>( result ) );
-            } else {
-               try {
-                  auto trx_trace_ptr = std::get<transaction_trace_ptr>( result );
-                  if( retry && trx_retry.has_value() && !trx_trace_ptr->except) {
-                     // will be ack'ed via next later
-                     trx_retry->track_transaction( ptrx, retry_num_blocks,
-                        [ptrx, next](const std::variant<fc::exception_ptr, std::unique_ptr<fc::variant>>& result ) {
-                           if( std::holds_alternative<fc::exception_ptr>( result ) ) {
-                              next( std::get<fc::exception_ptr>( result ) );
-                           } else {
-                              fc::variant& output = *std::get<std::unique_ptr<fc::variant>>( result );
-                              next( read_write::send_transaction_results{ptrx->id(), std::move( output )} );
-                           }
-                        } );
-                  } else {
-                     fc::variant output;
-                     try {
-                        output = db.to_variant_with_abi( *trx_trace_ptr, abi_serializer::create_yield_function( abi_serializer_max_time ) );
-                     } catch( chain::abi_exception& ) {
-                        output = *trx_trace_ptr;
-                     }
-                     const chain::transaction_id_type& id = trx_trace_ptr->id;
-                     next( read_write::send_transaction_results{id, std::move( output )} );
-                  }
-               } CATCH_AND_CALL( next );
-            }
-         });
-   } catch ( boost::interprocess::bad_alloc& ) {
+      app( ).get_method< incoming::methods::transaction_async >( )
+             ( ptrx, 
+               true, 
+               false,
+               static_cast< bool >( params.return_failure_trace ),
+               [ this, 
+                 ptrx, 
+                 next, 
+                 retry, 
+                 retry_num_blocks
+               ]( const std::variant<fc::exception_ptr, transaction_trace_ptr>& result )
+               -> void 
+               {
+                    if( std::holds_alternative<fc::exception_ptr>( result ) ) 
+                    {
+                       next( std::get<fc::exception_ptr>( result ) );
+                    } 
+                    else 
+                    {
+                       try 
+                       {
+                          auto trx_trace_ptr = std::get<transaction_trace_ptr>( result );
+
+                          if ( retry 
+                               && 
+                               trx_retry.has_value() 
+                               && 
+                               ! trx_trace_ptr->except
+                             ) 
+                          {
+                             // will be ack'ed via next later
+                             trx_retry->track_transaction
+                                        ( ptrx, 
+                                          retry_num_blocks,
+                                          [ ptrx, 
+                                            next
+                                          ]( const std::variant< fc::exception_ptr, std::unique_ptr< fc::variant > >& result ) 
+                                          {
+                                               if( std::holds_alternative<fc::exception_ptr>( result ) ) 
+                                               {
+                                                  next( std::get<fc::exception_ptr>( result ) );
+                                               } 
+                                               else 
+                                               {
+                                                  fc::variant& output = *std::get<std::unique_ptr<fc::variant>>( result );
+                                                  next( read_write::send_transaction_results{ptrx->id(), std::move( output )} );
+                                               }
+                                          }
+                                        );
+                          } 
+                          else
+                          {
+                             fc::variant output;
+                             try 
+                             {
+                                output = db.to_variant_with_abi( *trx_trace_ptr, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                             } 
+                             catch( chain::abi_exception& ) {
+                                output = *trx_trace_ptr;
+                             }
+                             const chain::transaction_id_type& id = trx_trace_ptr->id;
+                             next( read_write::send_transaction_results{id, std::move( output )} );
+                          }
+                       } CATCH_AND_CALL( next );
+                    }
+               }
+             );
+   } 
+   catch ( boost::interprocess::bad_alloc& ) {
       chain_plugin::handle_db_exhaustion();
-   } catch ( const std::bad_alloc& ) {
+   } 
+   catch ( const std::bad_alloc& ) {
       chain_plugin::handle_bad_alloc();
-   } CATCH_AND_CALL(next);
+   } 
+   CATCH_AND_CALL(next);
 }
 
 read_only::get_abi_results read_only::get_abi( const get_abi_params& params )const {
