@@ -353,23 +353,33 @@ struct controller_impl {
     *
     */
    template<typename Signal, typename Arg>
-   void emit( const Signal& s, Arg&& a ) {
-      try {
-         s( std::forward<Arg>( a ));
-      } catch (std::bad_alloc& e) {
+   void emit( const Signal& signal, 
+              Arg&& a
+            ) 
+   {
+      try 
+      {
+         signal( std::forward<Arg>( a ));
+      } 
+      catch (std::bad_alloc& e) {
          wlog( "std::bad_alloc: ${w}", ("w", e.what()) );
          throw e;
-      } catch (boost::interprocess::bad_alloc& e) {
+      } 
+      catch (boost::interprocess::bad_alloc& e) {
          wlog( "boost::interprocess::bad alloc: ${w}", ("w", e.what()) );
          throw e;
-      } catch ( controller_emit_signal_exception& e ) {
+      } 
+      catch ( controller_emit_signal_exception& e ) {
          wlog( "controller_emit_signal_exception: ${details}", ("details", e.to_detail_string()) );
          throw e;
-      } catch ( fc::exception& e ) {
+      } 
+      catch ( fc::exception& e ) {
          wlog( "fc::exception: ${details}", ("details", e.to_detail_string()) );
-      } catch ( std::exception& e ) {
+      } 
+      catch ( std::exception& e ) {
          wlog( "std::exception: ${details}", ("details", e.what()) );
-      } catch ( ... ) {
+      } 
+      catch ( ... ) {
          wlog( "signal handler threw exception" );
       }
    }
